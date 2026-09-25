@@ -1,0 +1,27 @@
+import { Area, CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import Panel from '../common/Panel.jsx';
+import DemoTag from '../common/DemoTag.jsx';
+
+export function ForecastLegend({ items }) { return <div className="forecast-legend">{items.map((item) => <span key={item.label} className={item.className}><i />{item.label}</span>)}</div>; }
+
+export function TemperatureHumidityChart({ data }) {
+  return <Panel eyebrow="TEMPERATURE & HUMIDITY - 24HR TREND" className="forecast-chart-panel" action={<DemoTag tone="orange">SIMULATED</DemoTag>}>
+    <ResponsiveContainer width="100%" height="100%"><LineChart data={data} margin={{ top: 12, right: 28, bottom: 8, left: 0 }}><CartesianGrid stroke="#153452" vertical={false} /><XAxis dataKey="time" tick={{ fill: '#37668f', fontSize: 10 }} tickLine={false} axisLine={false} interval={1} /><YAxis yAxisId="temp" domain={[-28, -18]} ticks={[-28, -25, -22, -18]} tick={{ fill: '#37668f', fontSize: 10 }} tickLine={false} axisLine={false} width={34} /><YAxis yAxisId="humidity" orientation="right" domain={[60, 80]} ticks={[60, 65, 70, 75, 80]} tick={{ fill: '#37668f', fontSize: 10 }} tickLine={false} axisLine={false} width={25} /><Tooltip contentStyle={{ background: '#0b2946', border: '1px solid #24547b', color: '#a1d9ff', fontSize: 11 }} /><Line yAxisId="temp" type="monotone" dataKey="temperature" stroke="#4db8ff" strokeWidth={2.5} dot={false} /><Line yAxisId="humidity" type="monotone" dataKey="humidity" stroke="#af8cff" strokeWidth={2} dot={false} /></LineChart></ResponsiveContainer>
+    <div className="forecast-chart-footer"><ForecastLegend items={[{ label: 'Temperature (°C)', className: 'legend-load' }, { label: 'Humidity (%)', className: 'legend-purple' }]} /><span>Replace with NCPOR feed when connected</span></div>
+  </Panel>;
+}
+
+export function WindDemandChart({ data }) {
+  return <Panel eyebrow="WIND SPEED & PREDICTED DEMAND - 24HR" className="forecast-chart-panel" action={<div className="forecast-badge-row"><DemoTag tone="orange">SIMULATED</DemoTag><DemoTag tone="blue">AI PREDICTION</DemoTag></div>}>
+    <ResponsiveContainer width="100%" height="100%"><LineChart data={data} margin={{ top: 12, right: 28, bottom: 8, left: 0 }}><CartesianGrid stroke="#153452" vertical={false} /><XAxis dataKey="time" tick={{ fill: '#37668f', fontSize: 10 }} tickLine={false} axisLine={false} interval={1} /><YAxis yAxisId="wind" domain={[10, 25]} ticks={[10, 14, 18, 25]} tick={{ fill: '#37668f', fontSize: 10 }} tickLine={false} axisLine={false} width={34} /><YAxis yAxisId="demand" orientation="right" domain={[0, 160]} ticks={[0, 40, 80, 120, 160]} tick={{ fill: '#37668f', fontSize: 10 }} tickLine={false} axisLine={false} width={25} /><Tooltip contentStyle={{ background: '#0b2946', border: '1px solid #24547b', color: '#a1d9ff', fontSize: 11 }} /><Line yAxisId="wind" type="monotone" dataKey="wind" stroke="#00d0a1" strokeWidth={2.5} dot={false} /><Line yAxisId="demand" type="monotone" dataKey="demand" stroke="#ffbf18" strokeWidth={2} strokeDasharray="5 4" dot={false} /></LineChart></ResponsiveContainer>
+    <div className="forecast-chart-footer"><ForecastLegend items={[{ label: 'Wind (kts) - Met obs', className: 'legend-wind' }, { label: 'Demand - AI Prediction', className: 'legend-demand' }]} /></div>
+  </Panel>;
+}
+
+export function DemandForecastChart({ data }) {
+  return <Panel eyebrow="DAY-AHEAD ELECTRIC DEMAND FORECAST - 36HR HORIZON" className="forecast-demand-panel" action={<span>LSTM + Gradient Boost ensemble - Updated 14:00</span>}><ResponsiveContainer width="100%" height="100%"><LineChart data={data} margin={{ top: 14, right: 10, bottom: 5, left: 0 }}><CartesianGrid stroke="#153452" vertical={false} /><XAxis dataKey="time" tick={{ fill: '#37668f', fontSize: 10 }} tickLine={false} axisLine={false} interval={1} /><YAxis domain={[0, 160]} ticks={[0, 40, 80, 120, 160]} tick={{ fill: '#37668f', fontSize: 10 }} tickLine={false} axisLine={false} width={34} /><Tooltip contentStyle={{ background: '#0b2946', border: '1px solid #24547b', color: '#a1d9ff', fontSize: 11 }} /><Area type="monotone" dataKey="forecast" stroke="none" fill="#133451" fillOpacity={0.8} /><Line type="monotone" dataKey="forecast" stroke="#4db8ff" strokeWidth={2.5} dot={false} /><Line type="monotone" dataKey="baseline" stroke="#ff6633" strokeWidth={1.7} strokeDasharray="4 3" dot={false} /><ReferenceLine x="14:00" stroke="#ffbf18" strokeDasharray="4 3" label={{ value: 'Now', fill: '#ffbf18', fontSize: 11, position: 'insideBottom' }} /></LineChart></ResponsiveContainer></Panel>;
+}
+
+export function RenewableChart({ data }) {
+  return <Panel eyebrow="RENEWABLE GENERATION FORECAST - NEXT 24HR" className="renewable-panel"><ResponsiveContainer width="100%" height="100%"><LineChart data={data} margin={{ top: 10, right: 8, bottom: 0, left: 0 }}><CartesianGrid stroke="#153452" vertical={false} /><XAxis dataKey="time" tick={{ fill: '#37668f', fontSize: 10 }} tickLine={false} axisLine={false} /><YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tick={{ fill: '#37668f', fontSize: 10 }} tickLine={false} axisLine={false} width={30} /><Tooltip contentStyle={{ background: '#0b2946', border: '1px solid #24547b', color: '#a1d9ff', fontSize: 11 }} /><Line type="monotone" dataKey="wind" stroke="#00d0a1" strokeWidth={2.5} dot={false} /><Line type="monotone" dataKey="solar" stroke="#ffbf18" strokeWidth={2} dot={false} /></LineChart></ResponsiveContainer></Panel>;
+}
