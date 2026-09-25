@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import DemoTag from '../components/common/DemoTag.jsx';
 import Panel from '../components/common/Panel.jsx';
 import MetricCard from '../components/dashboard/MetricCard.jsx';
@@ -7,7 +8,123 @@ import GenerationMixChart from '../components/charts/GenerationMixChart.jsx';
 import { DataQualityCard, EmissionsCard, HealthCard, PeakCard } from '../components/dashboard/InsightCards.jsx';
 
 export default function Dashboard() {
-  return <div className="dashboard-page"><div className="dashboard-heading"><div><h1>Overview</h1><p>Real-time station energy status · Polar winter regime · Day 34</p></div><div className="refresh-status"><i /> Auto-refresh 30s · Ψ-7 · 78°S 163°W</div></div><div className="metric-grid"><MetricCard eyebrow="PREDICTED LOAD" value="142" unit="kW" detail="+3.2% vs baseline" accent="blue" badge="AI PREDICTION" /><MetricCard eyebrow="WIND OUTPUT" value="87" unit="kW" detail="2 turbines · 73% cap" accent="green" /><MetricCard eyebrow="SOLAR OUTPUT" value="12" unit="kW" detail="4.2 hrs daylight today" accent="yellow" /><MetricCard eyebrow="DIESEL DISPATCH" value="43" unit="kW" detail="Optimization output" accent="orange" badge="AI PREDICTION" /><MetricCard eyebrow="CO₂ (DIESEL)" value="33.5" unit="kg/hr" detail="−62% vs diesel-only" accent="pale" /></div><LoadGenerationChart /><div className="chart-row"><GenerationMixChart /><BatteryCard /></div><div className="insight-row"><EmissionsCard /><PeakCard /><HealthCard /><DataQualityCard /></div><div className="demo-footer"><DemoTag tone="orange" /> Values shown are static demonstration data for the frontend prototype. No NCPOR, backend, MySQL, or AI/ML connection is active.</div></div>;
+  const [dashboard, setDashboard] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    async function loadDashboard() {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/dashboard');
+
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        setDashboard(data);
+        setError('');
+      } catch (loadError) {
+        setError(loadError.message || 'Unable to load dashboard data.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadDashboard();
+  }, []);
+
+  const station = dashboard?.station ?? { name: 'Maitri', status: 'ACTIVE' };
+  const assets = dashboard?.assets ?? [];
+  const onlineAssets = assets.filter((asset) => asset.status === 'ONLINE').length;
+
+  const metrics = [
+    {
+      eyebrow: 'STATION',
+      value: station.name || 'Maitri',
+      unit: '',
+      detail: `${station.status || 'ACTIVE'} status`,
+      accent: 'blue',
+      badge: 'LIVE DATA',
+    },
+    {
+      eyebrow: 'TOTAL ASSETS',
+      value: String(dashboard?.assetCount ?? 0),
+      unit: '',
+      detail: 'Registered in SQLite',
+      accent: 'green',
+    },
+    {
+      eyebrow: 'ONLINE ASSETS',
+      value: String(onlineAssets),
+      unit: '',
+      detail: 'Currently operational',
+      accent: 'yellow',
+    },
+    {
+      eyebrow: 'LAT/LNG',
+      value: `${station.latitude ?? '-67.123456'}`,
+      unit: '',
+      detail: `${station.longitude ?? '68.123456'} E`,
+      accent: 'orange',
+    },
+    {
+      eyebrow: 'STATION COUNTRY',
+      value: station.country || 'India',
+      unit: '',
+      detail: 'Antarctic research base',
+      accent: 'pale',
+    },
+  ];
+
+  return (
+    <div className="dashboard-page">
+      <div className="dashboard-heading">
+        <div>
+          <h1>Overview</h1>
+          <p>Real-time station energy status · Maitri EMS</p>
+        </div>
+        <div className="refresh-status"><i /> {loading ? 'Loading live data…' : 'Live backend connection active'}</div>
+      </div>
+
+      {error ? (
+        <div className="demo-footer" style={{ marginBottom: '1rem', color: '#ffb5a7' }}>
+          Live data unavailable: {error}
+        </div>
+      ) : null}
+
+      <div className="metric-grid">
+        {metrics.map((metric, index) => (
+          <MetricCard
+            key={`${metric.eyebrow}-${index}`}
+            eyebrow={metric.eyebrow}
+            value={metric.value}
+            unit={metric.unit}
+            detail={metric.detail}
+            accent={metric.accent}
+            badge={metric.badge}
+          />
+        ))}
+      </div>
+
+      <LoadGenerationChart />
+      <div className="chart-row">
+        <GenerationMixChart />
+        <BatteryCard />
+      </div>
+      <div className="insight-row">
+        <EmissionsCard />
+        <PeakCard />
+        <HealthCard />
+        <DataQualityCard />
+      </div>
+
+      <div className="demo-footer">
+        <DemoTag tone="orange" /> Live dashboard values are now coming from the backend API. Asset list: {assets.map((asset) => asset.name).join(', ') || 'No assets loaded'}.
+      </div>
+    </div>
+  );
 }
 
 export function PlaceholderPage({ title }) {
