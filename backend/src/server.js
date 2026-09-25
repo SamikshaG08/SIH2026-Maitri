@@ -1,18 +1,13 @@
 import express from 'express';
+import apiRoutes from './routes/api.js';
 
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(express.json());
-
-app.get('/api/health', (_request, response) => {
-  response.json({ status: 'foundation-ready' });
-});
+app.use('/api', apiRoutes);
 
 app.listen(port, () => {
-  console.log(`Maitri backend foundation listening on port ${port}`);
+  console.log(`Maitri backend listening on port ${port}`);
 });
-
-// TODO: Connect to MySQL database.
-// TODO: Register versioned REST API routes.
 

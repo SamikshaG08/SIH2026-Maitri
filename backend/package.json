@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "dev": "node --watch src/server.js",
+    "init-db": "node src/init-db.js"
   },
   "dependencies": {
+    "better-sqlite3": "^11.10.0",
     "express": "^4.21.1"
   }
 }
